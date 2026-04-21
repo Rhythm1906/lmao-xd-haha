@@ -1,12 +1,18 @@
-import { Download } from 'lucide-react'
+import { Download, HeartPulse, Zap } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { AnalogGauge } from '../components/AnalogGauge'
 import { ErrorState } from '../components/ErrorState'
 import { HistoricalCharts } from '../components/HistoricalCharts'
 import { LoadingState } from '../components/LoadingState'
 import { RangeTabs } from '../components/RangeTabs'
 import { useSensorData } from '../hooks/useSensorData'
 import type { TimeRange } from '../types/sensor'
-import { exportPointsToCsv, formatTimestamp } from '../utils/dataProcessing'
+import {
+  exportPointsToCsv,
+  formatTimestamp,
+  getHeartRatePhrase,
+  getStressThresholds,
+} from '../utils/dataProcessing'
 
 export const HistoricalPage = () => {
   const [range, setRange] = useState<TimeRange>('24h')
@@ -34,11 +40,15 @@ export const HistoricalPage = () => {
     return <LoadingState />
   }
 
+  const { low: gsrLow, medium: gsrMedium } = getStressThresholds()
+  const latestBpm = series.latest?.heartRate
+  const latestGsv = series.latest?.gsr
+
   return (
     <section className="space-y-5">
       <div className="glass-card fade-in flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-slate-50">Historical Trends</h2>
+          <h2 className="text-2xl font-semibold text-slate-50">Live Data</h2>
           <p className="mt-1 text-sm text-slate-400">Latest sample: {latestLabel}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -55,6 +65,31 @@ export const HistoricalPage = () => {
       </div>
 
       {error ? <ErrorState message={error} /> : null}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <AnalogGauge
+          label="Heart Rate"
+          value={latestBpm}
+          max={160}
+          unit="BPM"
+          status={getHeartRatePhrase(latestBpm)}
+          Icon={HeartPulse}
+        />
+        <AnalogGauge
+          label="Stress Level"
+          value={latestGsv}
+          max={gsrMedium + 200}
+          unit="μS"
+          status={
+            latestGsv < gsrLow
+              ? 'Low'
+              : latestGsv < gsrMedium
+              ? 'Medium'
+              : 'High'
+          }
+          Icon={Zap}
+        />
+      </div>
 
       <HistoricalCharts points={series.points} />
     </section>

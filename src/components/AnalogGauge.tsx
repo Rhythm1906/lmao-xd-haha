@@ -33,7 +33,7 @@ const getStrokeColor = (status: string) => {
 };
 
 export const AnalogGauge = ({ value, max, label, unit, status, Icon }: AnalogGaugeProps) => {
-  const percentage = Math.min(Math.max(value / max, 0), 1);
+  const percentage = value != null ? Math.min(Math.max(value / max, 0), 1) : 0;
   const offset = (1 - percentage / 2) * 282.743; // Only fill half a circle
   const strokeColor = getStrokeColor(status);
 
@@ -45,7 +45,7 @@ export const AnalogGauge = ({ value, max, label, unit, status, Icon }: AnalogGau
       </div>
       <div className="relative h-24 w-48">
         <svg
-          className="h-full w-full -rotate-180"
+          className="h-full w-full"
           viewBox="0 0 100 50"
           style={GAUGE_STYLES}
         >
@@ -64,7 +64,7 @@ export const AnalogGauge = ({ value, max, label, unit, status, Icon }: AnalogGau
             stroke={strokeColor}
             strokeWidth="8"
             strokeLinecap="round"
-            strokeDasharray="282.743"
+            strokeDasharray="141.3715" // Half of the circumference
             strokeDashoffset={offset}
             className="transition-all duration-500 ease-in-out"
           />
