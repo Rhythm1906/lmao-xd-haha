@@ -2,8 +2,8 @@ import { BarChart3, Lightbulb } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
 const links = [
-    { to: '/history', label: 'Live Data', icon: BarChart3 },
-    { to: '/dashboard', label: 'Information', icon: Lightbulb }
+    { to: '/dashboard', label: 'Live Data', icon: BarChart3 },
+    { to: '/history', label: 'Information', icon: Lightbulb }
 ]
 
 export const Navbar = () => (
