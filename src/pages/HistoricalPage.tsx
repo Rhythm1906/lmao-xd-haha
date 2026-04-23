@@ -43,6 +43,14 @@ export const HistoricalPage = () => {
   const { low: gsrLow, medium: gsrMedium } = getStressThresholds()
   const latestBpm = series.latest?.heartRate
   const latestGsv = series.latest?.gsr
+  const stressStatus =
+    typeof latestGsv === 'number'
+      ? latestGsv < gsrLow
+        ? 'Low'
+        : latestGsv < gsrMedium
+        ? 'Medium'
+        : 'High'
+      : 'Unavailable'
 
   return (
     <section className="space-y-5">
@@ -80,13 +88,7 @@ export const HistoricalPage = () => {
           value={latestGsv}
           max={gsrMedium + 200}
           unit="μS"
-          status={
-            latestGsv < gsrLow
-              ? 'Low'
-              : latestGsv < gsrMedium
-              ? 'Medium'
-              : 'High'
-          }
+          status={stressStatus}
           Icon={Zap}
         />
       </div>

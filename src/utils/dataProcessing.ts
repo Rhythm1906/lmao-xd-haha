@@ -23,6 +23,8 @@ const parseNumericField = (feed: ThingSpeakFeed, fieldNumber: number): number =>
   return 0
 }
 
+const isPlausibleHeartRate = (value: number): boolean => value >= 30 && value <= 220
+
 export const deriveStressLevel = (gsr: number): StressLevel => {
   if (gsr < GSR_LOW_THRESHOLD) {
     return 'Low'
@@ -95,7 +97,13 @@ export const normalizeFeeds = (feeds: ThingSpeakFeed[]): SensorPoint[] =>
   feeds.map((feed) => {
     const ecg = parseNumericField(feed, ECG_FIELD)
     const gsr = parseNumericField(feed, GSR_FIELD)
-    const heartRateValue = parseNumericField(feed, HEART_RATE_FIELD)
+    const configuredHeartRateValue = parseNumericField(feed, HEART_RATE_FIELD)
+    const heartRateValue =
+      configuredHeartRateValue > 0
+        ? configuredHeartRateValue
+        : HEART_RATE_FIELD !== ECG_FIELD && isPlausibleHeartRate(ecg)
+        ? ecg
+        : 0
 
     const point: SensorPoint = {
       timestamp: feed.created_at,

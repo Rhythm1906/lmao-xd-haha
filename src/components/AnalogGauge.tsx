@@ -2,13 +2,15 @@
 import type { LucideIcon } from 'lucide-react';
 
 interface AnalogGaugeProps {
-  value: number;
+  value?: number;
   max: number;
   label: string;
   unit: string;
   status: string;
   Icon: LucideIcon;
 }
+
+const HALF_CIRCUMFERENCE = 141.3715
 
 const GAUGE_STYLES = {
   '--gauge-circumference': '282.743',
@@ -34,7 +36,7 @@ const getStrokeColor = (status: string) => {
 
 export const AnalogGauge = ({ value, max, label, unit, status, Icon }: AnalogGaugeProps) => {
   const percentage = value != null ? Math.min(Math.max(value / max, 0), 1) : 0;
-  const offset = (1 - percentage / 2) * 282.743; // Only fill half a circle
+  const offset = HALF_CIRCUMFERENCE * (1 - percentage)
   const strokeColor = getStrokeColor(status);
 
   return (
@@ -64,14 +66,14 @@ export const AnalogGauge = ({ value, max, label, unit, status, Icon }: AnalogGau
             stroke={strokeColor}
             strokeWidth="8"
             strokeLinecap="round"
-            strokeDasharray="141.3715" // Half of the circumference
+            strokeDasharray={HALF_CIRCUMFERENCE}
             strokeDashoffset={offset}
             className="transition-all duration-500 ease-in-out"
           />
         </svg>
         <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center">
           <span className="text-3xl font-bold text-white">
-            {value?.toFixed(0) ?? '--'}
+            {value != null ? value.toFixed(0) : '00'}
           </span>
           <span className="text-sm text-slate-400">{unit}</span>
         </div>
